@@ -390,7 +390,8 @@ class PlayScreen(val game: Pavuk) : Screen {
                 val x = 24f + 100f * columns.first { !hasCards(it) }
                 val priority = mutableListOf<MutableList<Card?>>()
                 for (grade in 12 downTo 0) {
-                    priority.addAll(lastCards.filter { it.isNotEmpty() && it.last()!!.grade == grade })
+                    priority.addAll(lastCards.filter { it.isNotEmpty()
+                            && it.last()!!.grade == grade && above(it.last()!!) != null })
                     if (priority.isNotEmpty()) break
                 }
                 var max = 0
