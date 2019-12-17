@@ -47,6 +47,10 @@ class PlayScreen(val game: Pavuk) : Screen {
     // *** Создание колоды ***
     private val deck = mutableListOf<Card>()
     private var start = true
+    private val columns = setOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+    private var high = 0
+    private val grades = listOf("Ace", "Two", "Three", "Four", "Five",
+            "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King")
     private var moving = mutableListOf<Card>()
     private var oldColumn = 0
     private var backup = 0
@@ -96,14 +100,24 @@ class PlayScreen(val game: Pavuk) : Screen {
         return (card.grade == above(card)!!.grade - 1)
     }
 
-    private fun hasKing(column: Int): Boolean {
+    // grade = 0..12  ---  Two..Ace
+    private fun hasGrade(column: Int, grade: Int): Boolean {
         if (!hasCards(column)) return false
         val x = 24f + 100f * column
-        return deck.filter { it.bounds.x == x && it.isOpened }.any { it.grade == 12 }
+        if (!deck.filter { it.bounds.x == x && it.isOpened }.any { it.grade == 12 }) return false
+        else {
+            var card = lastCard(column)
+            while (card!!.grade != grade) {
+                if (above(card) != null && above(card)!!.grade == card.grade + 1)
+                    card = above(card)
+                else return false
+            }
+            return true
+        }
     }
 
     private fun sequence(column: Int): Boolean {
-        if (!hasKing(column)) return false
+        if (!hasGrade(column, 12)) return false
         var card = lastCard(column)!!
         for (i in 0..12) {
             if (card.grade != i || !card.isOpened) return false
@@ -129,8 +143,8 @@ class PlayScreen(val game: Pavuk) : Screen {
             font.draw(res.batch, "press 'menu' to exit", 512f, 340f, 0f, 1, false)
         }
 
-        if (moving.isEmpty() && setOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).any { sequence(it) }) {
-            val i = setOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).first { sequence(it) }
+        if (moving.isEmpty() && columns.any { sequence(it) }) {
+            val i = columns.first { sequence(it) }
             var card = lastCard(i)!!
             for (j in 0..12) {
                 val above = above(card) ?: card
@@ -247,11 +261,13 @@ class PlayScreen(val game: Pavuk) : Screen {
             if (moving.isNotEmpty()) {
                 from = 0f
                 to = 0f
+
             } else {
                 res.batch.draw(Texture("from.png"), from, 300f,
                         deck[0].width, deck[0].height)
                 res.batch.draw(Texture("to.png"), to, 300f,
                         deck[0].width, deck[0].height)
+                font.draw(res.batch, grades[high], (from + deck[0].width / 2), 295f, 0f, 1, false)
             }
         }
 
@@ -259,6 +275,7 @@ class PlayScreen(val game: Pavuk) : Screen {
         stage.draw()
 
         if (menu.button.isChecked) {
+            menu.button.toggle()
             game.screen = MainMenu(game)
             dispose()
         }
@@ -294,27 +311,33 @@ class PlayScreen(val game: Pavuk) : Screen {
 
     inner class Solver {
 
-        fun step(/* n: Int */) {
+        private fun formLastCards(repeats: Int): MutableList<MutableList<Card?>> {
             val lastCards = mutableListOf<MutableList<Card?>>()
             for (i in 0..9) lastCards.add(mutableListOf())
-            //for (j in n downTo 0) {
+            for (j in 0..repeats) {
                 for (i in 0..9) {
-                    lastCards[i].add(lastCard(i))
-                    while (lastCards[i].last() != null && upOrder(lastCards[i].last()!!))
+                    if (j == 0)
+                        lastCards[i] = mutableListOf(lastCard(i))
+                    else
+                        if (lastCards[i].isNotEmpty())
+                            if (above(lastCards[i].last()!!) != null
+                                    && above(lastCards[i].last()!!)!!.isOpened) {
+                                lastCards[i] = mutableListOf(above(lastCards[i].last()!!))
+                            } else lastCards[i].clear()
+                    while (lastCards[i].isNotEmpty() &&
+                            lastCards[i].last() != null && upOrder(lastCards[i].last()!!))
                         lastCards[i].add(above(lastCards[i].last()!!))
                     lastCards[i].remove(null)
                 }
-            //}
+            }
+            return lastCards
+        }
 
-            //val aboveLast = mutableListOf<MutableList<Card?>>()
-            //for (i in 0..9) {
-            //    aboveLast.add(mutableListOf())
-            //    aboveLast[i].add(above(lastCards[i].last()!!))
-            //    while (aboveLast[i].last() != null && upOrder(aboveLast[i].last()!!))
-            //        aboveLast[i].add(above(aboveLast[i].last()!!))
-            //    aboveLast[i].remove(null)
-            //}
+        fun step(/* n: Int */) {
+            var stepCommitted = false
+            val lastCards = formLastCards(0)
 
+            /*
             fun exact(set: List<Card>): Int {
                 val upper = lastCards.filter {
                     it.isNotEmpty() && it.first()!!.grade == set.last().grade + 1
@@ -330,6 +353,7 @@ class PlayScreen(val game: Pavuk) : Screen {
                 }
                 return num
             }
+            */
 
             for (i in 0..11) {
                 val lower = lastCards.filter { it.isNotEmpty() && it.last()!!.grade == i }.map {
@@ -350,6 +374,7 @@ class PlayScreen(val game: Pavuk) : Screen {
                 if (num != -1 && lower.isNotEmpty()) {
                     val index = lower.first()
                     var i = 0
+                    high = lastCards[index].last()!!.grade
                     from = lastCards[index].first()!!.bounds.x
                     to = lastCards[num].last()!!.bounds.x
                     for (elem in lastCards[index].reversed()) {
@@ -357,8 +382,35 @@ class PlayScreen(val game: Pavuk) : Screen {
                         elem!!.bounds.x = lastCards[num].last()!!.bounds.x
                         elem.bounds.y = lastCards[num].first()!!.bounds.y - i * 17f
                     }
+                    stepCommitted = true
                     break
                 }
+            }
+            if ( !stepCommitted && columns.any { !hasCards(it) }) {
+                val x = 24f + 100f * columns.first { !hasCards(it) }
+                val priority = mutableListOf<MutableList<Card?>>()
+                for (grade in 12 downTo 0) {
+                    priority.addAll(lastCards.filter { it.isNotEmpty() && it.last()!!.grade == grade })
+                    if (priority.isNotEmpty()) break
+                }
+                var max = 0
+                var cards = priority.first()
+                for (elem in priority) {
+                    if (elem.size > max) {
+                        max = elem.size
+                        cards = elem
+                    }
+                }
+                from = cards.first()!!.bounds.x
+                to = x
+                high = cards.last()!!.grade
+                var y = 752f - deck[0].height
+                for (card in cards.reversed()) {
+                    card!!.bounds.y = y
+                    card.bounds.x = x
+                    y -= 17
+                }
+                stepCommitted = true
             }
         }
 

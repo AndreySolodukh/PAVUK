@@ -20,7 +20,7 @@ class Resource {
 
     init {
         skin.addRegions(atlas)
-        parameter.size = 80
+        parameter.size = 40
         parameter.color = Color.WHITE
     }
 
