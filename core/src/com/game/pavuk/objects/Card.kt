@@ -24,7 +24,7 @@ class Card(private var texture: Sprite, val width: Float, val height: Float, var
             bounds.y = -100f
             bounds.x = -100f
         } else {
-            bounds.y = screenHeight * 0.99f - height - line * 0.022f * screenHeight
+            bounds.y = screenHeight * 0.97f - height - line * 0.022f * screenHeight
             bounds.x = 0.024f * screenWidth + 0.098f * screenWidth * column
         }
     }

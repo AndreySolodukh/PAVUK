@@ -78,9 +78,9 @@ class PlayScreen(val game: Pavuk) : Screen {
                         0.36f * res.height, 0f, 1, false)
             }
             if (res.defeat) {
-                font.draw(res.batch, "Game over",res.width / 2,
+                font.draw(res.batch, "Game over", res.width / 2,
                         0.44f * res.height, 0f, 1, false)
-                font.draw(res.batch, "press 'menu' to exit",res.width / 2,
+                font.draw(res.batch, "press 'menu' to exit", res.width / 2,
                         0.36f * res.height, 0f, 1, false)
             }
         } else cycle.move()
@@ -119,24 +119,23 @@ class PlayScreen(val game: Pavuk) : Screen {
             dispose()
         }
 
-        if (auto.button.isChecked && delay <= 0f)
+        if (auto.button.isChecked)
             if (!cycle.isOver()) {
-            Solver(res).step()
-            delay = 0.2f
+                Solver(res).step()
             } else auto.button.toggle()
 
         if (hint.button.isChecked && delay <= 0f)
             if (!cycle.isOver()) {
-            Solver(res).step()
-            delay = 0.5f
-            hint.button.toggle()
+                Solver(res).step()
+                delay = 0.5f
+                hint.button.toggle()
             } else hint.button.toggle()
 
         if (new.button.isChecked && delay <= 0f)
             if (!cycle.isOver()) {
-            cycle.new()
-            delay = 0.5f
-            new.button.toggle()
+                cycle.new()
+                delay = 0.5f
+                new.button.toggle()
             } else new.button.toggle()
     }
 
@@ -148,6 +147,7 @@ class PlayScreen(val game: Pavuk) : Screen {
         auto.dispose()
         menu.dispose()
         stage.dispose()
+        font.dispose()
     }
 
     override fun show() {}

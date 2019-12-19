@@ -130,12 +130,10 @@ class Dynamics(private val res: Resource) {
             if (!res.victory) res.defeat = true
         }
         if (res.backup > 0  && res.moving.isEmpty()) {
-            var column = 0
-            for (card in res.deck.filter { it.column == -1 }) {
-                if (column == 10) break
-                card.line = if (logic.hasCards(column)) logic.lastCard(column)!!.line + 1 else 0
-                card.column = column
-                column++
+            for (i in 0..9) {
+                val card = res.deck.first { it.column == -1 }
+                card.line = if (logic.hasCards(i)) logic.lastCard(i)!!.line + 1 else 0
+                card.column = i
             }
             res.backup--
         }

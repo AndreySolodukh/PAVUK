@@ -52,6 +52,8 @@ class Resource {
     }
 
     fun dispose() {
+        background.dispose()
+        skin.dispose()
         batch.dispose()
         atlas.dispose()
         generator.dispose()

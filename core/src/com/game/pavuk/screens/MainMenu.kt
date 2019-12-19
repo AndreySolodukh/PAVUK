@@ -67,6 +67,8 @@ class MainMenu(val game: Pavuk) : Screen {
     }
 
     override fun dispose() {
+        generator.dispose()
+        font.dispose()
         game.dispose()
         res.dispose()
         play.dispose()
