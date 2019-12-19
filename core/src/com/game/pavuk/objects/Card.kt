@@ -1,14 +1,13 @@
 package com.game.pavuk.objects
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Rectangle
 
-
-class Card(var texture: Sprite, val width: Float, val height: Float, var isOpened: Boolean,
-           val grade: Int, val indicator: Int) {
-
+class Card(private var texture: Sprite, val width: Float, val height: Float, var isOpened: Boolean,
+           val grade: Int, var column: Int, var line: Int, val indicator: Int) {
 
     val bounds = Rectangle(0f, 0f, width, height)
 
@@ -18,11 +17,29 @@ class Card(var texture: Sprite, val width: Float, val height: Float, var isOpene
         else Sprite(TextureAtlas("pack.atlas").findRegion("back"))
     }
 
+    fun updateCoords() {
+        if (this.column !in 0..9) {
+            bounds.y = -100f
+            bounds.x = -100f
+        } else {
+            bounds.y = 752f - height - 17f * line
+            bounds.x = 24f + 100f * column
+        }
+    }
+
+    fun upgradeMoving(moving: MutableList<Int>) {
+        bounds.y = Gdx.graphics.height.toFloat() - Gdx.input.y -
+                height * 0.92f - 17f * (moving.lastIndex - moving.indexOf(this.indicator))
+        bounds.x = Gdx.input.x - width / 2
+    }
+
     fun draw(batch: SpriteBatch) {
-        val obj = Sprite(texture)
-        obj.setOrigin(width / 2f, height / 2f)
-        obj.setSize(width, height)
-        obj.setPosition(bounds.x, bounds.y)
-        obj.draw(batch)
+        if (bounds.x to bounds.y != -100f to -100f) {
+            val obj = Sprite(texture)
+            obj.setOrigin(width / 2f, height / 2f)
+            obj.setSize(width, height)
+            obj.setPosition(bounds.x, bounds.y)
+            obj.draw(batch)
+        }
     }
 }

@@ -3,9 +3,11 @@ package com.game.pavuk.screens
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.game.pavuk.*
@@ -23,9 +25,12 @@ class MainMenu(val game: Pavuk) : Screen {
 
     private val stage = Stage()
     private val input = InputMultiplexer()
-
+    private val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
+    private val generator = FreeTypeFontGenerator(Gdx.files.internal("pixel.ttf"))
 
     init {
+        parameter.size = 100
+        parameter.color = Color.GREEN
         res.background.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         camera.position.set(Vector3(1000f, 500f, 0f))
         stage.addActor(exit.button)
@@ -34,6 +39,8 @@ class MainMenu(val game: Pavuk) : Screen {
         Gdx.input.inputProcessor = input
     }
 
+    private val font = generator.generateFont(parameter)
+
     override fun render(delta: Float) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         camera.update()
@@ -41,6 +48,9 @@ class MainMenu(val game: Pavuk) : Screen {
 
         res.batch.begin()
         res.batch.draw(res.background, 0f, 0f, 2000f, 1000f)
+        font.draw(res.batch, "PAVUK SUPER COOL CARD GAME", 1000f, 850f, 0f, 1, false)
+        font.draw(res.batch, "WITH RESCHATEL'", 1000f, 750f, 0f, 1, false)
+
         res.batch.end()
         stage.draw()
 
