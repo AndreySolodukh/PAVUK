@@ -15,7 +15,7 @@ import com.game.pavuk.objects.TextGameButton
 class PlayScreen(val game: Pavuk) : Screen {
 
     private val res = Resource()
-    private val camera = OrthographicCamera(1024f, 768f)
+    private val camera = OrthographicCamera(res.width, res.height)
 
     private val menu = TextGameButton("menu", "button", "pressedbutton", 0.72f * res.width,
             0.02f * res.height, 0.08f * res.width, 0.04f * res.width)
@@ -24,7 +24,7 @@ class PlayScreen(val game: Pavuk) : Screen {
     private val hint = TextGameButton("hint", "button", "pressedbutton", 0.46f * res.width,
             0.02f * res.height, 0.08f * res.width, 0.04f * res.width)
     private val auto = TextGameButton("auto", "button", "pressedbutton", 0.46f * res.width,
-            0.08f * res.height, 0.08f * res.width, 0.04f * res.width)
+            0.12f * res.height, 0.08f * res.width, 0.04f * res.width)
 
     private val stage = Stage()
     private val input = InputMultiplexer()
@@ -32,16 +32,16 @@ class PlayScreen(val game: Pavuk) : Screen {
 
     init {
         res.background.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-        camera.position.set(Vector3(512f, 384f, 0f))
+        camera.position.set(Vector3(res.width / 2, res.height / 2, 0f))
         stage.addActor(menu.button)
         stage.addActor(new.button)
         stage.addActor(hint.button)
         stage.addActor(auto.button)
         input.addProcessor(stage)
         Gdx.input.inputProcessor = input
-        res.parameter.spaceX = 5
+        res.parameter.spaceX = (res.height * 0.0065f).toInt()
         res.parameter.borderColor = Color.BLACK
-        res.parameter.size = 70
+        res.parameter.size = (res.height * 0.091f).toInt()
 
         res.buildDeck()
     }
@@ -60,21 +60,28 @@ class PlayScreen(val game: Pavuk) : Screen {
 
         res.batch.begin()
 
-        res.batch.draw(res.background, 0f, 0f, 1024f, 768f)
+        res.batch.draw(res.background, 0f, 0f, res.width, res.height)
 
-        font.draw(res.batch, "In - ${res.backup}", 70f, 40f, 0f, 1, false)
+        font.draw(res.batch, "In - ${res.backup}", 0.068f * res.width,
+                0.05f * res.height, 0f, 1, false)
         if (res.backup == 0 && !cycle.isOver())
-            font.draw(res.batch, "Press 'new' to give up", 240f, 100f, 0f, 1, false)
-        font.draw(res.batch, "Out - ${res.finished}", 954f, 40f, 0f, 1, false)
+            font.draw(res.batch, "Press 'new' to give up", 0.24f * res.width,
+                    0.18f * res.height, 0f, 1, false)
+        font.draw(res.batch, "Out - ${res.finished}", 0.93f * res.width,
+                0.05f * res.height, 0f, 1, false)
 
         if (cycle.isOver()) {
             if (res.victory) {
-                font.draw(res.batch, "You won!", 512f, 400f, 0f, 1, false)
-                font.draw(res.batch, "press 'menu' to exit", 512f, 340f, 0f, 1, false)
+                font.draw(res.batch, "You won!", res.width / 2,
+                        0.44f * res.height, 0f, 1, false)
+                font.draw(res.batch, "press 'menu' to exit", res.width / 2,
+                        0.36f * res.height, 0f, 1, false)
             }
             if (res.defeat) {
-                font.draw(res.batch, "Game over", 512f, 400f, 0f, 1, false)
-                font.draw(res.batch, "press 'menu' to exit", 512f, 340f, 0f, 1, false)
+                font.draw(res.batch, "Game over",res.width / 2,
+                        0.44f * res.height, 0f, 1, false)
+                font.draw(res.batch, "press 'menu' to exit",res.width / 2,
+                        0.36f * res.height, 0f, 1, false)
             }
         } else cycle.move()
 
@@ -89,8 +96,8 @@ class PlayScreen(val game: Pavuk) : Screen {
 
         if (!cycle.isOver()) {
             if (res.moving.isEmpty() && res.from != -1 && res.to != -1) {
-                font.draw(res.batch, "From", 74f + 100f * res.from, 280f, 0f, 1, false)
-                font.draw(res.batch, "To", 74f + 100f * res.to, 280f, 0f, 1, false)
+                font.draw(res.batch, "From", 0.072f * res.width + 0.098f * res.width * res.from, 0.36f * res.height, 0f, 1, false)
+                font.draw(res.batch, "To", 0.072f * res.width + 0.098f * res.width * res.to, 0.36f * res.height, 0f, 1, false)
             }
             if (res.moving.isNotEmpty()) {
                 res.from = -1

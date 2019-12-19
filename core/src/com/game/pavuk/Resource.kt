@@ -19,14 +19,15 @@ class Resource {
     val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
     val generator = FreeTypeFontGenerator(Gdx.files.internal("pixel.ttf"))
 
-    init {
-        skin.addRegions(atlas)
-        parameter.size = 40
-        parameter.color = Color.WHITE
-    }
-
     val width = Gdx.graphics.width.toFloat()
     val height = Gdx.graphics.height.toFloat()
+
+
+    init {
+        skin.addRegions(atlas)
+        parameter.size = (height / 20).toInt()
+        parameter.color = Color.WHITE
+    }
 
     val deck = mutableListOf<Card>()
     val columns = setOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
@@ -45,8 +46,8 @@ class Resource {
             for (i in 0..103)
                 random.add(i % 13)
             for ((i, elem) in random.shuffled().withIndex()) {
-                deck.add(Card(Sprite(atlas.findRegion("$elem")), 76f,
-                        114f, true, elem, -1, 0, i))
+                deck.add(Card(Sprite(atlas.findRegion("$elem")), width * 0.074f,
+                        height * 0.15f, true, elem, -1, 0, i))
             }
     }
 

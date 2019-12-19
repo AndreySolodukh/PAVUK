@@ -10,6 +10,8 @@ class Card(private var texture: Sprite, val width: Float, val height: Float, var
            val grade: Int, var column: Int, var line: Int, val indicator: Int) {
 
     val bounds = Rectangle(0f, 0f, width, height)
+    private val screenWidth = Gdx.graphics.width.toFloat()
+    private val screenHeight = Gdx.graphics.height.toFloat()
 
     fun switch() {
         isOpened = !isOpened
@@ -22,14 +24,14 @@ class Card(private var texture: Sprite, val width: Float, val height: Float, var
             bounds.y = -100f
             bounds.x = -100f
         } else {
-            bounds.y = 752f - height - 17f * line
-            bounds.x = 24f + 100f * column
+            bounds.y = screenHeight * 0.99f - height - line * 0.022f * screenHeight
+            bounds.x = 0.024f * screenWidth + 0.098f * screenWidth * column
         }
     }
 
     fun upgradeMoving(moving: MutableList<Int>) {
         bounds.y = Gdx.graphics.height.toFloat() - Gdx.input.y -
-                height * 0.92f - 17f * (moving.lastIndex - moving.indexOf(this.indicator))
+                height * 0.92f - 0.022f * screenHeight * (moving.lastIndex - moving.indexOf(this.indicator))
         bounds.x = Gdx.input.x - width / 2
     }
 

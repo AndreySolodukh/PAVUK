@@ -11,8 +11,8 @@ class TextGameButton(text: String, up: String, down: String, x: Float,
                      y: Float, width: Float, height: Float) {
 
     private val atlas = TextureAtlas("pack.atlas")
-    private val generator = FreeTypeFontGenerator(Gdx.files.internal("Pixel.ttf"))
     private val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
+    private val generator = FreeTypeFontGenerator(Gdx.files.internal("pixel.ttf"))
     private val skin = Skin()
 
     init {

@@ -54,7 +54,9 @@ class Dynamics(private val res: Resource) {
                 val x = Gdx.input.x
                 val y = res.height - Gdx.input.y
                 if (res.moving.isEmpty()) {
-                    val column = if ((x - 12) / 100 < 10) (x - 12) / 100 else 9
+                    val column = if ((x - 0.012f * res.width) / (0.098f * res.width) < 10)
+                        ((x - 0.012f * res.width) / (0.098f * res.width)).toInt()
+                    else 9
                     if (logic.hasCards(column)) {
                         var card = logic.lastCard(column)
                         while (card != null) {
@@ -69,7 +71,10 @@ class Dynamics(private val res: Resource) {
                         if (high.bounds.y + height < y || low.bounds.y > y) res.moving.clear()
                         if (res.moving.isNotEmpty()) {
                             val pos = low.bounds.x.toInt()
-                            res.oldColumn = if ((pos - 12) / 100 < 10) (pos - 12) / 100 else 9
+                            res.oldColumn =
+                                    if ((pos - 0.012f * res.width) / (0.098f * res.width) < 10)
+                                        ((pos - 0.012f * res.width) / (0.098f * res.width)).toInt()
+                                    else 9
                             for (i in res.moving) {
                                 res.deck.first { it.indicator == i }.column = -1
                             }
@@ -81,7 +86,9 @@ class Dynamics(private val res: Resource) {
                 val low = res.deck.first { it.indicator == res.moving.first() }
                 val high = res.deck.first { it.indicator == res.moving.last() }
                 val x = (low.bounds.x + width / 2).toInt()
-                val column: Int = if ((x - 12) / 100 < 10) (x - 12) / 100 else 9
+                val column: Int = if ((x - 0.012f * res.width) / (0.098f * res.width) < 10)
+                    ((x - 0.012f * res.width) / (0.098f * res.width)).toInt()
+                else 9
                 var line = 0
                 if (!logic.hasCards(column)) {
                     for (i in res.moving.reversed()) {

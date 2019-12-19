@@ -16,12 +16,12 @@ import com.game.pavuk.objects.TextGameButton
 class MainMenu(val game: Pavuk) : Screen {
 
     private val res = Resource()
-    private val camera = OrthographicCamera(2000f, 1000f)
+    private val camera = OrthographicCamera(res.width, res.height)
 
     private val play = TextGameButton("PLAY", "button", "pressedbutton",
             0.4f * res.width, 0.4f * res.height, 0.2f * res.width, 0.1f * res.width)
     private val exit = TextGameButton("exit", "button", "pressedbutton",
-            0.4f * res.width, 0.2f * res.height, 0.2f * res.width, 0.1f * res.width)
+            0.4f * res.width, 0.15f * res.height, 0.2f * res.width, 0.1f * res.width)
 
     private val stage = Stage()
     private val input = InputMultiplexer()
@@ -29,10 +29,10 @@ class MainMenu(val game: Pavuk) : Screen {
     private val generator = FreeTypeFontGenerator(Gdx.files.internal("pixel.ttf"))
 
     init {
-        parameter.size = 100
+        parameter.size = (res.height / 10).toInt()
         parameter.color = Color.GREEN
         res.background.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-        camera.position.set(Vector3(1000f, 500f, 0f))
+        camera.position.set(Vector3(res.width / 2, res.height / 2, 0f))
         stage.addActor(exit.button)
         stage.addActor(play.button)
         input.addProcessor(stage)
@@ -47,9 +47,11 @@ class MainMenu(val game: Pavuk) : Screen {
         res.batch.projectionMatrix = camera.combined
 
         res.batch.begin()
-        res.batch.draw(res.background, 0f, 0f, 2000f, 1000f)
-        font.draw(res.batch, "PAVUK SUPER COOL CARD GAME", 1000f, 850f, 0f, 1, false)
-        font.draw(res.batch, "WITH RESCHATEL'", 1000f, 750f, 0f, 1, false)
+        res.batch.draw(res.background, 0f, 0f, res.width, res.height)
+        font.draw(res.batch, "PAVUK SUPER COOL CARD GAME", res.width / 2, res.height * 0.85f,
+                0f, 1, false)
+        font.draw(res.batch, "WITH RESCHATEL'", res.width / 2, res.height * 0.75f,
+                0f, 1, false)
 
         res.batch.end()
         stage.draw()
