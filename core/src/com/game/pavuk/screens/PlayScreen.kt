@@ -136,6 +136,9 @@ class PlayScreen(val game: Pavuk) : Screen {
     override fun dispose() {
         game.dispose()
         res.dispose()
+        new.dispose()
+        hint.dispose()
+        auto.dispose()
         menu.dispose()
         stage.dispose()
     }
