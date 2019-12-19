@@ -29,7 +29,7 @@ class Card(private var texture: Sprite, val width: Float, val height: Float, var
         }
     }
 
-    fun upgradeMoving(moving: MutableList<Int>) {
+    fun updateMoving(moving: MutableList<Int>) {
         bounds.y = Gdx.graphics.height.toFloat() - Gdx.input.y -
                 height * 0.92f - 0.022f * screenHeight * (moving.lastIndex - moving.indexOf(this.indicator))
         bounds.x = Gdx.input.x - width / 2

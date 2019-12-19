@@ -2,11 +2,20 @@ package com.game.pavuk
 
 import com.game.pavuk.objects.Card
 
-class Logic(private val deck: MutableList<Card>) {
+class Logic(private val res: Resource) {
 
-    private fun cardsInColumn(column: Int) = deck.filter { it.column == column }
+    private fun cardsInColumn(column: Int) = res.deck.filter { it.column == column }
 
-    fun hasCards(column: Int) = deck.any { it.column == column }
+    fun hasCards(column: Int) = res.deck.any { it.column == column }
+
+    fun lastLine(): Int {
+        var max = 0
+        for (column in res.columns) {
+            val last = lastCard(column)
+            if (last != null && last.line > max) max = last.line
+        }
+        return max
+    }
 
     fun lastCard(column: Int): Card? {
         if (!hasCards(column)) return null

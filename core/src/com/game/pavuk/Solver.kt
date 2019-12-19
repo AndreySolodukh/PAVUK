@@ -4,7 +4,7 @@ import com.game.pavuk.objects.Card
 
 class Solver(private val res: Resource) {
 
-    private val logic = Logic(res.deck)
+    private val logic = Logic(res)
 
     private fun formLastCards(repeats: Int): MutableList<MutableList<Card?>> {
         val lastCards = mutableListOf<MutableList<Card?>>()
@@ -102,7 +102,7 @@ class Solver(private val res: Resource) {
                 var size = 0
                 var index = mutableListOf<Card?>()
                 for (pack in suitable) {
-                    if (pack.size > size) {
+                    if (pack.size >= size) {
                         size = pack.size
                         index = pack
                     }

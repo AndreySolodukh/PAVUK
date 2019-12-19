@@ -14,7 +14,7 @@ import com.game.pavuk.objects.TextGameButton
 
 class PlayScreen(val game: Pavuk) : Screen {
 
-    private val res = Resource()
+    private val res = Resource(game)
     private val camera = OrthographicCamera(res.width, res.height)
 
     private val menu = TextGameButton("menu", "button", "pressedbutton", 0.72f * res.width,
@@ -47,6 +47,7 @@ class PlayScreen(val game: Pavuk) : Screen {
     }
 
     private var delay = 0f
+    private var countdown = 4f
 
     override fun render(delta: Float) {
 
@@ -85,10 +86,9 @@ class PlayScreen(val game: Pavuk) : Screen {
             }
         } else cycle.move()
 
-        for (i in 0..50) {
-            val cards = res.deck.filter { it.indicator !in res.moving && it.line == i }
-            if (cards.isEmpty()) break
-            for (card in cards) {
+
+        for (i in 0..Logic(res).lastLine()) {
+            for (card in res.deck.filter { it.indicator !in res.moving && it.line == i }) {
                 card.updateCoords()
                 card.draw(res.batch)
             }
@@ -106,11 +106,20 @@ class PlayScreen(val game: Pavuk) : Screen {
         }
 
         for (card in res.deck.filter { it.indicator in res.moving }.sortedBy { it.line }) {
-            card.upgradeMoving(res.moving)
+            card.updateMoving(res.moving)
             card.draw(res.batch)
         }
 
+        if (res.music && countdown.toInt() > 0) {
+            font.draw(res.batch, "Solving starts in", res.width / 2,
+                    0.44f * res.height, 0f, 1, false)
+            font.draw(res.batch, "${countdown.toInt()}", res.width / 2,
+                    0.36f * res.height, 0f, 1, false)
+            countdown -= delta
+        }
+
         res.batch.end()
+
         stage.draw()
 
         if (menu.button.isChecked) {
@@ -119,10 +128,19 @@ class PlayScreen(val game: Pavuk) : Screen {
             dispose()
         }
 
-        if (auto.button.isChecked)
+        if (auto.button.isChecked && delay <= 0) {
             if (!cycle.isOver()) {
-                Solver(res).step()
-            } else auto.button.toggle()
+                delay = 0.075f
+                res.from = -1
+                res.to = -1
+                if (!res.music) res.switchmusic()
+                if (countdown.toInt() == 0 || !game.allowMusic) Solver(res).step()
+            } else {
+                if (res.music) res.switchmusic()
+                auto.button.toggle()
+                countdown = 4f
+            }
+        }
 
         if (hint.button.isChecked && delay <= 0f)
             if (!cycle.isOver()) {

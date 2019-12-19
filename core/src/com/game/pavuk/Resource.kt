@@ -1,6 +1,7 @@
 package com.game.pavuk
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
@@ -10,7 +11,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.game.pavuk.objects.Card
 
-class Resource {
+class Resource(val game: Pavuk) {
 
     private val atlas = TextureAtlas("pack.atlas")
     private val skin = Skin()
@@ -27,6 +28,22 @@ class Resource {
         skin.addRegions(atlas)
         parameter.size = (height / 20).toInt()
         parameter.color = Color.WHITE
+    }
+
+    var music = false
+    private val theme = Gdx.audio.newMusic(Gdx.files.internal("SolverTheme.mp3"))
+
+    fun switchmusic() {
+        if (game.allowMusic) {
+            if (!music) {
+                music = true
+                theme.play()
+            } else {
+                music = false
+                theme.stop()
+                theme.dispose()
+            }
+        }
     }
 
     val deck = mutableListOf<Card>()

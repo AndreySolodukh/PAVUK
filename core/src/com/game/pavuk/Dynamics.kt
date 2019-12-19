@@ -6,7 +6,7 @@ class Dynamics(private val res: Resource) {
 
     private val height = res.deck[0].height
     private val width = res.deck[0].width
-    private val logic = Logic(res.deck)
+    private val logic = Logic(res)
 
     init {
         if (res.finished == 8) res.victory = true
@@ -134,6 +134,7 @@ class Dynamics(private val res: Resource) {
                 val card = res.deck.first { it.column == -1 }
                 card.line = if (logic.hasCards(i)) logic.lastCard(i)!!.line + 1 else 0
                 card.column = i
+                card.updateCoords()
             }
             res.backup--
         }
