@@ -15,8 +15,8 @@ class Card(private var texture: Sprite, val width: Float, val height: Float, var
 
     fun switch() {
         isOpened = !isOpened
-        texture = if (isOpened) Sprite(TextureAtlas("pack.atlas").findRegion("$grade"))
-        else Sprite(TextureAtlas("pack.atlas").findRegion("back"))
+        texture = if (isOpened) Sprite(TextureAtlas("android/assets/pack.atlas").findRegion("$grade"))
+        else Sprite(TextureAtlas("android/assets/pack.atlas").findRegion("back"))
     }
 
     fun updateCoords() {

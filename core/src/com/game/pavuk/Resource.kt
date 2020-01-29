@@ -13,12 +13,12 @@ import com.game.pavuk.objects.Card
 
 class Resource(val game: Pavuk) {
 
-    private val atlas = TextureAtlas("pack.atlas")
+    private val atlas = TextureAtlas("android/assets/pack.atlas")
     private val skin = Skin()
-    val background = Texture("background.png")
+    val background = Texture("android/assets/background.png")
     val batch = SpriteBatch()
     val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
-    val generator = FreeTypeFontGenerator(Gdx.files.internal("pixel.ttf"))
+    val generator = FreeTypeFontGenerator(Gdx.files.internal("android/assets/pixel.ttf"))
 
     val width = Gdx.graphics.width.toFloat()
     val height = Gdx.graphics.height.toFloat()
@@ -31,7 +31,7 @@ class Resource(val game: Pavuk) {
     }
 
     var music = false
-    private val theme = Gdx.audio.newMusic(Gdx.files.internal("SolverTheme.mp3"))
+    private val theme = Gdx.audio.newMusic(Gdx.files.internal("android/assets/SolverTheme.mp3"))
 
     fun switchmusic() {
         if (game.allowMusic) {

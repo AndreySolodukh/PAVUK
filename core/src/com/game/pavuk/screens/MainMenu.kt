@@ -28,7 +28,7 @@ class MainMenu(val game: Pavuk) : Screen {
     private val stage = Stage()
     private val input = InputMultiplexer()
     private val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
-    private val generator = FreeTypeFontGenerator(Gdx.files.internal("pixel.ttf"))
+    private val generator = FreeTypeFontGenerator(Gdx.files.internal("android/assets/pixel.ttf"))
 
     init {
         parameter.size = (res.height / 10).toInt()
