@@ -5,8 +5,6 @@ import com.game.pavuk.screens.MainMenu
 
 class Pavuk : Game() {
 
-    var allowMusic = true
-
     override fun create() {
         setScreen(MainMenu(this))
     }

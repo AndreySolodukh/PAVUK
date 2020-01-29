@@ -22,8 +22,6 @@ class MainMenu(val game: Pavuk) : Screen {
             0.4f * res.width, 0.4f * res.height, 0.2f * res.width, 0.1f * res.width)
     private val exit = TextGameButton("exit", "button", "pressedbutton",
             0.4f * res.width, 0.17f * res.height, 0.2f * res.width, 0.1f * res.width)
-    private val music = TextGameButton("music", "pressedbutton", "button",
-            0.03f * res.width, 0.03f * res.height, 0.12f * res.width, 0.06f * res.width)
 
     private val stage = Stage()
     private val input = InputMultiplexer()
@@ -37,7 +35,6 @@ class MainMenu(val game: Pavuk) : Screen {
         camera.position.set(Vector3(res.width / 2, res.height / 2, 0f))
         stage.addActor(exit.button)
         stage.addActor(play.button)
-        stage.addActor(music.button)
         input.addProcessor(stage)
         Gdx.input.inputProcessor = input
     }
@@ -63,8 +60,6 @@ class MainMenu(val game: Pavuk) : Screen {
             game.screen = PlayScreen(game)
             dispose()
         }
-
-        game.allowMusic = music.button.isChecked
 
         if (exit.button.isChecked) {
             Gdx.app.exit()

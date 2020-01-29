@@ -47,7 +47,6 @@ class PlayScreen(val game: Pavuk) : Screen {
     }
 
     private var delay = 0f
-    private var countdown = 4f
 
     override fun render(delta: Float) {
 
@@ -110,14 +109,6 @@ class PlayScreen(val game: Pavuk) : Screen {
             card.draw(res.batch)
         }
 
-        if (res.music && countdown.toInt() > 0) {
-            font.draw(res.batch, "Solving starts in", res.width / 2,
-                    0.44f * res.height, 0f, 1, false)
-            font.draw(res.batch, "${countdown.toInt()}", res.width / 2,
-                    0.36f * res.height, 0f, 1, false)
-            countdown -= delta
-        }
-
         res.batch.end()
 
         stage.draw()
@@ -133,12 +124,9 @@ class PlayScreen(val game: Pavuk) : Screen {
                 delay = 0.075f
                 res.from = -1
                 res.to = -1
-                if (!res.music) res.switchmusic()
-                if (countdown.toInt() == 0 || !game.allowMusic) Solver(res).step()
+                Solver(res).step()
             } else {
-                if (res.music) res.switchmusic()
                 auto.button.toggle()
-                countdown = 4f
             }
         }
 

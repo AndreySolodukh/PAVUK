@@ -30,22 +30,6 @@ class Resource(val game: Pavuk) {
         parameter.color = Color.WHITE
     }
 
-    var music = false
-    private val theme = Gdx.audio.newMusic(Gdx.files.internal("android/assets/SolverTheme.mp3"))
-
-    fun switchmusic() {
-        if (game.allowMusic) {
-            if (!music) {
-                music = true
-                theme.play()
-            } else {
-                music = false
-                theme.stop()
-                theme.dispose()
-            }
-        }
-    }
-
     val deck = mutableListOf<Card>()
     val columns = setOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
     var moving = mutableListOf<Int>()
