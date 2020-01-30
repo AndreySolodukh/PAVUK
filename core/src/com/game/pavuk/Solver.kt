@@ -61,13 +61,11 @@ class Solver(private val deck: Deck) {
             }
         }
         var line = if (logic.hasCards(index)) logic.lastCard(index)!!.line + 1 else 0
-        deck.from = pack.first()!!.column
         for (elem in pack.filterNotNull().reversed()) {
             elem.line = line
             elem.column = index
             line++
         }
-        deck.to = pack.first()!!.column
     }
 
     private fun suitable(set: List<MutableList<Card?>>): MutableList<Card?> {
@@ -143,7 +141,7 @@ class Solver(private val deck: Deck) {
         }
 
         private fun getBest(): Int {
-            return movePriority.indexOf(movePriority.maxBy{ it })
+            return movePriority.indexOf(movePriority.max())
         }
 
         fun getBestPack() = packsToMove[getBest()]

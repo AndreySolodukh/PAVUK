@@ -99,7 +99,6 @@ class Dynamics(private val deck: Deck) {
                     }
                     deck.moving.clear()
                 } else {
-                    // column != oldColumn - нужно, чтобы предотвратить вылет (наверное)
                     if (column != deck.oldColumn && logic.lastCard(column)!!.grade == high.grade + 1) {
                         line = logic.lastCard(column)!!.line + 1
                         for (i in deck.moving.reversed()) {

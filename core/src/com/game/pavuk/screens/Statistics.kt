@@ -98,30 +98,32 @@ class Statistics(val game: Pavuk, private val music: Music) : Screen {
             val cycle = Dynamics(deck)
 
             if (game.start) {
-                game.victory = false
-                game.defeat = false
                 deck.deck.clear()
                 deck.buildDeck()
-                cycle.move()
-                for (elem in deck.deck) print("${elem.grade}${elem.suit} || ")
-                println("")
             }
 
             if (cycle.isOver()) {
                 if (game.victory) {
                     victories++
+                    game.victory = false
+                    game.defeat = false
+                    deck.backup = 5
+                    deck.finished = 0
                     game.start = true
                     games--
                 }
                 if (game.defeat) {
                     defeats++
+                    game.victory = false
+                    game.defeat = false
+                    deck.backup = 5
+                    deck.finished = 0
                     game.start = true
                     games--
                 }
             } else {
                 cycle.move()
                 Solver(deck).step()
-                println("+++")
             }
         }
 
@@ -129,12 +131,12 @@ class Statistics(val game: Pavuk, private val music: Music) : Screen {
             launched = false
             if (launch.button.isChecked) launch.button.toggle()
             games = 1
-            println(" V | D")
-            println(victories to defeats)
-            victories = 0
-            defeats = 0
         }
 
+        font.draw(batch, "VICTORIES - $victories", screenWidth / 2, screenHeight * 0.83f,
+                0f, 1, false)
+        font.draw(batch, "DEFEATS - $defeats", screenWidth / 2, screenHeight * 0.73f,
+                0f, 1, false)
 
         batch.end()
         stage.draw()
@@ -162,9 +164,13 @@ class Statistics(val game: Pavuk, private val music: Music) : Screen {
         }
 
         if (launch.button.isChecked && !launched) {
+            victories = 0
+            defeats = 0
             game.start = true
             game.defeat = false
             game.victory = false
+            deck.finished = 0
+            deck.backup = 5
             launched = true
         }
 
