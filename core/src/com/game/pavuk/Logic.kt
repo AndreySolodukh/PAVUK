@@ -1,16 +1,17 @@
 package com.game.pavuk
 
 import com.game.pavuk.objects.Card
+import kotlin.NoSuchElementException
 
-class Logic(private val res: Resource) {
+class Logic(private val deck: Deck) {
 
-    private fun cardsInColumn(column: Int) = res.deck.filter { it.column == column }
+    private fun cardsInColumn(column: Int) = deck.deck.filter { it.column == column }
 
-    fun hasCards(column: Int) = res.deck.any { it.column == column }
+    fun hasCards(column: Int) = deck.deck.any { it.column == column }
 
     fun lastLine(): Int {
         var max = 0
-        for (column in res.columns) {
+        for (column in deck.columns) {
             val last = lastCard(column)
             if (last != null && last.line > max) max = last.line
         }
@@ -38,7 +39,7 @@ class Logic(private val res: Resource) {
     fun upOrder(card: Card): Boolean {
         if (above(card) == null) return false
         if (!above(card)!!.isOpened) return false
-        return (card.grade == above(card)!!.grade - 1)
+        return (card.grade == above(card)!!.grade - 1 && card.suit == above(card)!!.suit)
     }
 
     fun gradeInColumn(column: Int, grade: Int): Boolean {
@@ -49,6 +50,14 @@ class Logic(private val res: Resource) {
             else card = above(card)!!
         }
         return true
+    }
+
+    fun highInColumn(column: Int): Int {
+        var card = lastCard(column) ?: return -1
+        while (above(card) != null && above(card)!!.grade == card.grade + 1 ) {
+            card = above(card)!!
+        }
+        return card.grade
     }
 
     fun sequence(column: Int): Boolean =

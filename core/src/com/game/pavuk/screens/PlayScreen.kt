@@ -7,44 +7,65 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.game.pavuk.*
 import com.game.pavuk.objects.TextGameButton
 
-class PlayScreen(val game: Pavuk) : Screen {
+class PlayScreen(val game: Pavuk, val music: Music) : Screen {
 
-    private val res = Resource(game)
-    private val camera = OrthographicCamera(res.width, res.height)
+    private val screenWidth = Gdx.graphics.width.toFloat()
+    private val screenHeight = Gdx.graphics.height.toFloat()
 
-    private val menu = TextGameButton("menu", "button", "pressedbutton", 0.72f * res.width,
-            0.02f * res.height, 0.08f * res.width, 0.04f * res.width)
-    private val new = TextGameButton("new", "button", "pressedbutton", 0.2f * res.width,
-            0.02f * res.height, 0.08f * res.width, 0.04f * res.width)
-    private val hint = TextGameButton("hint", "button", "pressedbutton", 0.46f * res.width,
-            0.02f * res.height, 0.08f * res.width, 0.04f * res.width)
-    private val auto = TextGameButton("auto", "button", "pressedbutton", 0.46f * res.width,
-            0.12f * res.height, 0.08f * res.width, 0.04f * res.width)
+    private val background = Texture("android/assets/background.png")
+
+    private val camera = OrthographicCamera(screenWidth, screenHeight)
+
+    private val batch = SpriteBatch()
+
+    private val menu = TextGameButton("menu", "button", "pressedbutton", 0.72f * screenWidth,
+            0.02f * screenHeight, 0.08f * screenWidth, 0.04f * screenWidth)
+    private val new = TextGameButton("new", "button", "pressedbutton", 0.2f * screenWidth,
+            0.02f * screenHeight, 0.08f * screenWidth, 0.04f * screenWidth)
+    private val hint = TextGameButton("hint", "button", "pressedbutton", 0.46f * screenWidth,
+            0.02f * screenHeight, 0.08f * screenWidth, 0.04f * screenWidth)
+    private val auto = TextGameButton("auto", "button", "pressedbutton", 0.46f * screenWidth,
+            0.12f * screenHeight, 0.08f * screenWidth, 0.04f * screenWidth)
+
+    private val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
+    private val generator = FreeTypeFontGenerator(Gdx.files.internal("android/assets/pixel.ttf"))
 
     private val stage = Stage()
     private val input = InputMultiplexer()
-    private val font = res.generator.generateFont(res.parameter)
+
+
+    private val deck = Deck(game)
 
     init {
-        res.background.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-        camera.position.set(Vector3(res.width / 2, res.height / 2, 0f))
+
+        game.start = true
+        game.defeat = false
+        game.victory = false
+
+        background.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+        camera.position.set(Vector3(screenWidth / 2, screenHeight / 2, 0f))
         stage.addActor(menu.button)
         stage.addActor(new.button)
         stage.addActor(hint.button)
         stage.addActor(auto.button)
         input.addProcessor(stage)
         Gdx.input.inputProcessor = input
-        res.parameter.spaceX = (res.height * 0.0065f).toInt()
-        res.parameter.borderColor = Color.BLACK
-        res.parameter.size = (res.height * 0.091f).toInt()
+        parameter.color = Color.WHITE
+        parameter.borderColor = Color.BLACK
+        parameter.size = (screenHeight * 0.04f).toInt()
+        parameter.spaceX = (screenHeight * 0.0065f).toInt()
 
-        res.buildDeck()
+        deck.buildDeck()
     }
+
+    private val font = generator.generateFont(parameter)
 
     private var delay = 0f
     private var countdown = 4f
@@ -53,90 +74,90 @@ class PlayScreen(val game: Pavuk) : Screen {
 
         if (delay > 0f) delay -= delta
 
-        val cycle = Dynamics(res)
+        val cycle = Dynamics(deck)
 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         camera.update()
-        res.batch.projectionMatrix = camera.combined
+        batch.projectionMatrix = camera.combined
 
-        res.batch.begin()
+        batch.begin()
 
-        res.batch.draw(res.background, 0f, 0f, res.width, res.height)
+        batch.draw(background, 0f, 0f, screenWidth, screenHeight)
 
-        font.draw(res.batch, "In - ${res.backup}", 0.068f * res.width,
-                0.05f * res.height, 0f, 1, false)
-        if (res.backup == 0 && !cycle.isOver())
-            font.draw(res.batch, "Press 'new' to give up", 0.24f * res.width,
-                    0.18f * res.height, 0f, 1, false)
-        font.draw(res.batch, "Out - ${res.finished}", 0.93f * res.width,
-                0.05f * res.height, 0f, 1, false)
+        font.draw(batch, "In - ${deck.backup}", 0.068f * screenWidth,
+                0.05f * screenHeight, 0f, 1, false)
+        if (deck.backup == 0 && !cycle.isOver())
+            font.draw(batch, "Press 'new' to give up", 0.24f * screenWidth,
+                    0.18f * screenHeight, 0f, 1, false)
+        font.draw(batch, "Out - ${deck.finished}", 0.93f * screenWidth,
+                0.05f * screenHeight, 0f, 1, false)
 
         if (cycle.isOver()) {
-            if (res.victory) {
-                font.draw(res.batch, "You won!", res.width / 2,
-                        0.44f * res.height, 0f, 1, false)
-                font.draw(res.batch, "press 'menu' to exit", res.width / 2,
-                        0.36f * res.height, 0f, 1, false)
+            if (game.victory) {
+                font.draw(batch, "You won!", screenWidth / 2,
+                        0.44f * screenHeight, 0f, 1, false)
+                font.draw(batch, "press 'menu' to exit", screenWidth / 2,
+                        0.36f * screenHeight, 0f, 1, false)
             }
-            if (res.defeat) {
-                font.draw(res.batch, "Game over", res.width / 2,
-                        0.44f * res.height, 0f, 1, false)
-                font.draw(res.batch, "press 'menu' to exit", res.width / 2,
-                        0.36f * res.height, 0f, 1, false)
+            if (game.defeat) {
+                font.draw(batch, "Game over", screenWidth / 2,
+                        0.44f * screenHeight, 0f, 1, false)
+                font.draw(batch, "press 'menu' to exit", screenWidth / 2,
+                        0.36f * screenHeight, 0f, 1, false)
             }
         } else cycle.move()
 
 
-        for (i in 0..Logic(res).lastLine()) {
-            for (card in res.deck.filter { it.indicator !in res.moving && it.line == i }) {
+        for (i in 0..Logic(deck).lastLine()) {
+            for (card in deck.deck.filter { it.indicator !in deck.moving && it.line == i }) {
                 card.updateCoords()
-                card.draw(res.batch)
+                card.draw(batch)
             }
         }
 
         if (!cycle.isOver()) {
-            if (res.moving.isEmpty() && res.from != -1 && res.to != -1) {
-                font.draw(res.batch, "From", 0.072f * res.width + 0.098f * res.width * res.from, 0.36f * res.height, 0f, 1, false)
-                font.draw(res.batch, "To", 0.072f * res.width + 0.098f * res.width * res.to, 0.36f * res.height, 0f, 1, false)
+            if (deck.moving.isEmpty() && deck.from != -1 && deck.to != -1) {
+                font.draw(batch, "From", 0.072f * screenWidth + 0.098f * screenWidth * deck.from, 0.36f * screenHeight, 0f, 1, false)
+                font.draw(batch, "To", 0.072f * screenWidth + 0.098f * screenWidth * deck.to, 0.36f * screenHeight, 0f, 1, false)
             }
-            if (res.moving.isNotEmpty()) {
-                res.from = -1
-                res.to = -1
+            if (deck.moving.isNotEmpty()) {
+                deck.from = -1
+                deck.to = -1
             }
         }
 
-        for (card in res.deck.filter { it.indicator in res.moving }.sortedBy { it.line }) {
-            card.updateMoving(res.moving)
-            card.draw(res.batch)
+        for (card in deck.deck.filter { it.indicator in deck.moving }.sortedBy { it.line }) {
+            card.updateMoving(deck.moving)
+            card.draw(batch)
         }
 
-        if (res.music && countdown.toInt() > 0) {
-            font.draw(res.batch, "Solving starts in", res.width / 2,
-                    0.44f * res.height, 0f, 1, false)
-            font.draw(res.batch, "${countdown.toInt()}", res.width / 2,
-                    0.36f * res.height, 0f, 1, false)
+        if (music.isOn && countdown.toInt() > 0) {
+            font.draw(batch, "Solving starts in", screenWidth / 2,
+                    0.44f * screenHeight, 0f, 1, false)
+            font.draw(batch, "${countdown.toInt()}", screenWidth / 2,
+                    0.36f * screenHeight, 0f, 1, false)
             countdown -= delta
         }
 
-        res.batch.end()
+        batch.end()
 
         stage.draw()
 
         if (menu.button.isChecked) {
             menu.button.toggle()
-            game.screen = MainMenu(game)
+            game.screen = MainMenu(game, music)
             dispose()
         }
 
         if (auto.button.isChecked && delay <= 0) {
             if (!cycle.isOver()) {
                 delay = 0.075f
-                res.from = -1
-                res.to = -1
-                if (!res.music) res.switchmusic()
-                if (countdown.toInt() == 0 || !game.allowMusic) Solver(res).step()
+                deck.from = -1
+                deck.to = -1
+                if (!music.isOn) music.switch()
+                if (countdown.toInt() == 0 || !music.isAllowed) Solver(deck).step()
             } else {
-                if (res.music) res.switchmusic()
+                if (music.isOn) music.switch()
                 auto.button.toggle()
                 countdown = 4f
             }
@@ -144,7 +165,7 @@ class PlayScreen(val game: Pavuk) : Screen {
 
         if (hint.button.isChecked && delay <= 0f)
             if (!cycle.isOver()) {
-                Solver(res).step()
+                Solver(deck).step()
                 delay = 0.5f
                 hint.button.toggle()
             } else hint.button.toggle()
@@ -159,13 +180,15 @@ class PlayScreen(val game: Pavuk) : Screen {
 
     override fun dispose() {
         game.dispose()
-        res.dispose()
+        generator.dispose()
         new.dispose()
         hint.dispose()
         auto.dispose()
         menu.dispose()
         stage.dispose()
         font.dispose()
+        background.dispose()
+        batch.dispose()
     }
 
     override fun show() {}

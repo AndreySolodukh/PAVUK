@@ -1,22 +1,34 @@
 package com.game.pavuk.objects
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Rectangle
 
-class Card(private var texture: Sprite, val width: Float, val height: Float, var isOpened: Boolean,
-           val grade: Int, var column: Int, var line: Int, val indicator: Int) {
+/*
+class Card(isOpened: Boolean, grade: Int, suit: Char, column: Int, line: Int, indicator: Int) :
+        GameObject(isOpened, grade, suit, column, line, indicator)
+*/
 
-    val bounds = Rectangle(0f, 0f, width, height)
+class Card(var isOpened: Boolean,
+           val grade: Int, val suit: Char, var column: Int, var line: Int, val indicator: Int) {
+
+    private var texture = if (isOpened) Sprite(Texture("android/assets/${this.grade}${this.suit}.png"))
+    else Sprite(Texture("android/assets/back.png"))
+
     private val screenWidth = Gdx.graphics.width.toFloat()
     private val screenHeight = Gdx.graphics.height.toFloat()
 
+    private val cardWidth = screenWidth * 0.074f
+    private val cardHeight = screenHeight * 0.15f
+
+    val bounds = Rectangle(0f, 0f, cardWidth, cardHeight)
+
     fun switch() {
         isOpened = !isOpened
-        texture = if (isOpened) Sprite(TextureAtlas("pack.atlas").findRegion("$grade"))
-        else Sprite(TextureAtlas("pack.atlas").findRegion("back"))
+        texture = if (isOpened) Sprite(Texture("android/assets/${this.grade}${this.suit}.png"))
+        else Sprite(Texture("android/assets/back.png"))
     }
 
     fun updateCoords() {
@@ -24,22 +36,23 @@ class Card(private var texture: Sprite, val width: Float, val height: Float, var
             bounds.y = -100f
             bounds.x = -100f
         } else {
-            bounds.y = screenHeight * 0.97f - height - line * 0.022f * screenHeight
+            bounds.y = screenHeight * 0.97f - cardHeight - line * 0.022f * screenHeight
             bounds.x = 0.024f * screenWidth + 0.098f * screenWidth * column
         }
     }
 
     fun updateMoving(moving: MutableList<Int>) {
         bounds.y = Gdx.graphics.height.toFloat() - Gdx.input.y -
-                height * 0.92f - 0.022f * screenHeight * (moving.lastIndex - moving.indexOf(this.indicator))
-        bounds.x = Gdx.input.x - width / 2
+                cardHeight * 0.92f - 0.022f * screenHeight * (moving.lastIndex - moving.indexOf(this.indicator))
+        bounds.x = Gdx.input.x - cardWidth / 2
     }
 
     fun draw(batch: SpriteBatch) {
         if (bounds.x to bounds.y != -100f to -100f) {
+
             val obj = Sprite(texture)
-            obj.setOrigin(width / 2f, height / 2f)
-            obj.setSize(width, height)
+            obj.setOrigin(cardWidth / 2f, cardHeight / 2f)
+            obj.setSize(cardWidth, cardHeight)
             obj.setPosition(bounds.x, bounds.y)
             obj.draw(batch)
         }
