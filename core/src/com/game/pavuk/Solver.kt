@@ -312,6 +312,5 @@ class Solver(private val deck: Deck) {
             }
 
         }
-        Dynamics(deck).new()
     }
 }

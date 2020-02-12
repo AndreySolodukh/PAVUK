@@ -19,12 +19,8 @@ class Logic(private val deck: Deck) {
     }
 
     fun lastCard(column: Int): Card? {
-        if (!hasCards(column)) return null
-        val cards = cardsInColumn(column)
-        var max = -1
-        for (card in cards.map { it.line })
-            if (card > max) max = card
-        return cards.first { it.line == max }
+        return if (!hasCards(column)) null
+        else cardsInColumn(column).maxBy { it.line }
     }
 
     fun above(card: Card): Card? {

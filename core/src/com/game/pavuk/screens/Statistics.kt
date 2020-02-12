@@ -77,6 +77,7 @@ class Statistics(val game: Pavuk, private val music: Music) : Screen {
     var victories = 0
     var defeats = 0
 
+    private var pathfinder = Pathfinder(deck)
 
     override fun render(delta: Float) {
 
@@ -100,6 +101,7 @@ class Statistics(val game: Pavuk, private val music: Music) : Screen {
             if (game.start) {
                 deck.deck.clear()
                 deck.buildDeck()
+                pathfinder = Pathfinder(deck)
             }
 
             if (cycle.isOver()) {
@@ -123,7 +125,7 @@ class Statistics(val game: Pavuk, private val music: Music) : Screen {
                 }
             } else {
                 cycle.move()
-                Solver(deck).step()
+                pathfinder.makeMove() //OneSolver(deck).step(0, setOf())
             }
         }
 

@@ -70,6 +70,10 @@ class PlayScreen(val game: Pavuk, val music: Music) : Screen {
     private var delay = 0f
     private var countdown = 4f
 
+
+    private val pathfinder = Pathfinder(deck)
+
+
     override fun render(delta: Float) {
 
         if (delay > 0f) delay -= delta
@@ -115,17 +119,6 @@ class PlayScreen(val game: Pavuk, val music: Music) : Screen {
             }
         }
 
-        if (!cycle.isOver()) {
-            if (deck.moving.isEmpty() && deck.from != -1 && deck.to != -1) {
-                font.draw(batch, "From", 0.072f * screenWidth + 0.098f * screenWidth * deck.from, 0.36f * screenHeight, 0f, 1, false)
-                font.draw(batch, "To", 0.072f * screenWidth + 0.098f * screenWidth * deck.to, 0.36f * screenHeight, 0f, 1, false)
-            }
-            if (deck.moving.isNotEmpty()) {
-                deck.from = -1
-                deck.to = -1
-            }
-        }
-
         for (card in deck.deck.filter { it.indicator in deck.moving }.sortedBy { it.line }) {
             card.updateMoving(deck.moving)
             card.draw(batch)
@@ -151,11 +144,9 @@ class PlayScreen(val game: Pavuk, val music: Music) : Screen {
 
         if (auto.button.isChecked && delay <= 0) {
             if (!cycle.isOver()) {
-                delay = 0.075f
-                deck.from = -1
-                deck.to = -1
+                delay = /* 2f */ 0.075f
                 if (!music.isOn) music.switch()
-                if (countdown.toInt() == 0 || !music.isAllowed) Solver(deck).step()
+                if (countdown.toInt() == 0 || !music.isAllowed) pathfinder.makeMove() // OneSolver(deck).step(0, setOf())
             } else {
                 if (music.isOn) music.switch()
                 auto.button.toggle()
@@ -165,7 +156,8 @@ class PlayScreen(val game: Pavuk, val music: Music) : Screen {
 
         if (hint.button.isChecked && delay <= 0f)
             if (!cycle.isOver()) {
-                Solver(deck).step()
+                //OneSolver(deck).step(0)
+                pathfinder.makeMove()
                 delay = 0.5f
                 hint.button.toggle()
             } else hint.button.toggle()
